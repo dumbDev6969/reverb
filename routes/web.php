@@ -12,7 +12,7 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 Route::middleware(['auth', 'verified'])->group(function () {
-    Volt::route('report-page', 'report-form')->name('report-page');
+    Volt::route('report-page', 'report-form')->name('report.page');
 
     Volt::route('reports', 'reports')->name('reports');
 });

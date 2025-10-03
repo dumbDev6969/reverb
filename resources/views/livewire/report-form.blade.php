@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Illuminate\Support\Facades\Log;
+use App\Events\ReportSubmitted;
+
 new class extends Component {
     #[Validate]
     public $title = '';
@@ -28,18 +30,18 @@ new class extends Component {
         $validated = $this->validate();
 
         try {
-            Report::create([
+            $report = Report::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'user_id' => Auth::user()->id,
             ]);
 
-            session()->flash('success', 'Report has been sent successfully.');
+            ReportSubmitted::dispatch($report);
+
             $this->reset('title', 'description');
             $this->showToast = true;
             $this->dispatchBrowserEvent('toast-hide', ['timeout' => 3000]);
-
-            return redirect()->back();
+             session()->flash('success', 'Report has been sent successfully.');
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
