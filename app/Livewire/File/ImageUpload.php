@@ -17,15 +17,21 @@ class ImageUpload extends Component
     #[Validate]
     public $image;
 
-    public $uploadKey;
+    public $uploadKey; 
 
+    // Validation rules
     protected $rules = [
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
     ];
+    // Validation messages
+    protected $messages = [
+        'image.max' => 'Image size should not be greater than 1MB.',
+    ];
+
 
     public function mount() 
     {
-        $this->uploadKey = rand();
+        $this->uploadKey = uniqid();
     }
     public function save () 
     {
@@ -38,9 +44,7 @@ class ImageUpload extends Component
                 'user_id' => Auth::user()->id
             ]);
 
-            $this->image = null;
-            $this->reset('image');
-            $this->uploadKey = rand();
+            $this->removeImage(); // Reset after uploading
 
             session()->flash('success', 'Image has been uploaded successfully.');
 
@@ -48,8 +52,13 @@ class ImageUpload extends Component
             Log::error($e->getMessage());
             session()->flash('error', 'An error occurred while uploading the image.');
         }
-        
+    
+    }
 
+    public function removeImage() 
+    {
+        $this->image = null;
+        $this->uploadKey = uniqid();
     }
     public function render()
     {

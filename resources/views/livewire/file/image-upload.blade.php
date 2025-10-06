@@ -1,28 +1,32 @@
 <div>
-      @if (session('success'))
-        <flux:callout icon="bell" variant="secondary" inline x-data="{ visible: true }" x-show="visible">
-            <flux:callout.heading class="flex gap-2 @max-md:flex-col items-start">{{ session('success') }}<flux:text>{{ session('time') }}
-                </flux:text>
-            </flux:callout.heading>
-            <x-slot name="controls">
-                <flux:button icon="x-mark" variant="ghost" x-on:click="visible = false" />
-            </x-slot>
-        </flux:callout>
-    @else
-        <flux:callout icon="bell" variant="secondary" inline x-data="{ visible: true }" x-show="visible">
-            <flux:callout.heading class="flex gap-2 @max-md:flex-col items-start">{{ session('error') }} <flux:text>{{ session('time') }}
-                </flux:text>
-            </flux:callout.heading>
-            <x-slot name="controls">
-                <flux:button icon="x-mark" variant="ghost" x-on:click="visible = false" />
-            </x-slot>
-        </flux:callout>
-    @endif
+    <div class="mb-5">
+        @if (session('success'))
+            <flux:callout icon="bell" variant="secondary" inline x-data="{ visible: true }" x-show="visible">
+                <flux:callout.heading class="flex gap-2 @max-md:flex-col items-start">{{ session('success') }}<flux:text>
+                        {{ session('time') }}
+                    </flux:text>
+                </flux:callout.heading>
+                <x-slot name="controls">
+                    <flux:button icon="x-mark" variant="ghost" x-on:click="visible = false" />
+                </x-slot>
+            </flux:callout>
+        @elseif (session('error'))
+            <flux:callout icon="bell" variant="secondary" inline x-data="{ visible: true }" x-show="visible">
+                <flux:callout.heading class="flex gap-2 @max-md:flex-col items-start">{{ session('error') }} <flux:text>
+                        {{ session('time') }}
+                    </flux:text>
+                </flux:callout.heading>
+                <x-slot name="controls">
+                    <flux:button icon="x-mark" variant="ghost" x-on:click="visible = false" />
+                </x-slot>
+            </flux:callout>
+        @endif
+    </div>
     {{-- Secure File Upload Component --}}
     <form wire:submit.prevent="save" x-data="fileUpload()" class="mx-auto w-full max-w-md">
 
         {{-- Dropzone --}}
-        <div class="flex items-center justify-center w-full" @dragover.prevent="dragging = true"
+        <div class="flex items-center justify-center w-full flex-col" @dragover.prevent="dragging = true"
             @dragleave.prevent="dragging = false" @drop.prevent="handleDrop($event)">
             <label for="dropzone-file"
                 class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer 
@@ -45,9 +49,28 @@
                 </div>
 
                 {{-- Livewire File Input --}}
+
                 <input id="dropzone-file" type="file" class="hidden" wire:key="upload-{{ $uploadKey }}"
-                    wire:model.live="image" @change="handleFiles($event)" />
+                    wire:model="image" @change="handleFiles($event)" />
+
             </label>
+            <div>
+                @if ($image)
+                    <figure
+                        class="relative max-w-sm transition-all duration-300 cursor-pointer filter grayscale hover:grayscale-0">
+                       
+                            <img class="rounded-lg z-0" src="{{ $image->temporaryUrl() }}" alt="image description">
+                        
+                        <div class="absolute top-2 right-2 z-10">
+                            <flux:button icon="x-mark" variant="ghost" wire:click="removeImage" class="!text-black" />
+                        </div>
+                    </figure>
+                @endif
+
+            </div>
+
+
+
         </div>
 
         {{-- Livewire Validation Feedback --}}
@@ -55,13 +78,7 @@
             <p class="text-sm text-red-500 mt-2">{{ $message }}</p>
         @enderror
 
-        {{-- Preview --}}
-        <template x-if="file">
-            <div class="mt-4 text-center">
-                <p class="text-sm text-gray-600">Selected: <span x-text="file.name"></span></p>
-                <img :src="preview" alt="Preview" class="mx-auto mt-2 h-32 object-contain rounded-lg border" />
-            </div>
-        </template>
+
 
         {{-- Upload Button --}}
         <div class="mt-6 text-center">
@@ -70,9 +87,9 @@
 
     </form>
 
-  
 
-    {{-- Alpine Script --}}
+
+
     <script>
         function fileUpload() {
             return {
