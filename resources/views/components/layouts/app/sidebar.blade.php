@@ -18,6 +18,8 @@
                     <flux:navlist.item icon="map" :href="route('report.page')" :current="request()->routeIs('report.page')" wire:navigate>{{ __('Report') }}</flux:navlist.item>
 
                     <flux:navlist.item icon="map" :href="route('reports')" :current="request()->routeIs('reports')" wire:navigate>{{ __('All reports') }}</flux:navlist.item>
+
+                    <flux:navlist.item icon="folder-plus" :href="route('file.upload')" :current="request()->routeIs('file.upload')" wire:navigate>{{ __('Upload') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 

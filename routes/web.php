@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
-
+use App\Livewire\File\ImageUpload;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -11,6 +11,11 @@ Route::get('/', function () {
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('upload', ImageUpload::class)->name('file.upload');
+}); 
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('report-page', 'report-form')->name('report.page');
 

@@ -41,7 +41,7 @@ new class extends Component {
             $this->reset('title', 'description');
             $this->showToast = true;
             $this->dispatchBrowserEvent('toast-hide', ['timeout' => 3000]);
-             session()->flash('success', 'Report has been sent successfully.');
+            session()->flash('success', 'Report has been sent successfully.');
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
@@ -49,6 +49,7 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-4 p-3 max-w-5xl mx-auto h-200 flex justify-center  items-center">
+    
     <form method="POST" wire:submit.prevent="report" class="flex flex-col gap-4 w-full ">
         <flux:input type="text" label="{{ __('Title') }}" wire:model.blur="title" placeholder="Title" />
 
