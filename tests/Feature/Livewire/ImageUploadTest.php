@@ -3,7 +3,9 @@
 namespace Tests\Feature\Livewire;
 
 use App\Livewire\File\ImageUpload;
+
 use App\Models\User;
+use App\Models\Report;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Livewire\Livewire;
@@ -26,4 +28,6 @@ class ImageUploadTest extends TestCase
 
         $this->get(route('file.upload'))->assertSeeLivewire(ImageUpload::class);
     }
+
+   
 }
