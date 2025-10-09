@@ -6,6 +6,7 @@ use Livewire\Attributes\Layout;
 use App\Models\Report;
 use App\Models\User;
 use Livewire\Attributes\On;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 new class extends Component {
     public $reports;
@@ -53,8 +54,11 @@ new class extends Component {
         $this->loadReports();
     }
 
-    public function update(Report $report)
+    public function update(Request $request, Report $report)
     {
+        // Determine if a use can update report
+        $this->authorize('update', $report);
+
         $this->validate();
         
         $report->update([
