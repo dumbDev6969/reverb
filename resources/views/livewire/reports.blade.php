@@ -6,14 +6,18 @@ use Livewire\Attributes\Layout;
 use App\Models\Report;
 use App\Models\User;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 new class extends Component {
     public $reports;
-    
+
     public $editingReportId = null;
     public $editTitle = '';
     public $editDescription = '';
+
+    #[Url]
+    public $search = '';
 
     protected function rules()
     {
@@ -33,7 +37,15 @@ new class extends Component {
     #[On('echo:moderator-reports,.report-submitted')]
     public function loadReports()
     {
-        $this->reports = Report::latest()->get();
+        if ($this->search) {
+            $this->reports = Report::where('title', 'LIKE', '%' . $this->search . '%')->get();
+        } else {
+            $this->reports = Report::latest()->get();
+        }
+    }
+    public function updatedSearch()
+    {
+        $this->loadReports();
     }
 
     public function mount()
@@ -60,22 +72,23 @@ new class extends Component {
         $this->authorize('update', $report);
 
         $this->validate();
-        
+
         $report->update([
             'title' => $this->editTitle,
             'description' => $this->editDescription,
         ]);
-        
+
         $this->reset('editTitle', 'editDescription', 'editingReportId');
         $this->loadReports();
-        
+
         $this->dispatch('close-modal', 'edit-report-' . $report->id);
     }
-
-    
 }; ?>
 
 <div class="space-y-4">
+    <div class="flex justify-end">
+        <flux:input icon="magnifying-glass" placeholder="Search reports" wire:model.live.debounce.500ms="search" />
+    </div>
     @foreach ($reports as $report)
         <div class="p-4 rounded-lg border border-neutral-600 flex justify-between items-center"
             wire:key="report-{{ $report->id }}">
@@ -89,8 +102,10 @@ new class extends Component {
                     <flux:modal.trigger name="edit-report-{{ $report->id }}">
                         <flux:button size="sm" wire:click="editReport({{ $report->id }})">Edit</flux:button>
                     </flux:modal.trigger>
-                    <flux:button size="sm" variant="primary" wire:click="accept({{ $report->id }})">Accept</flux:button>
-                    <flux:button size="sm" variant="filled" wire:click="reject({{ $report->id }})">Reject</flux:button>
+                    <flux:button size="sm" variant="primary" wire:click="accept({{ $report->id }})">Accept
+                    </flux:button>
+                    <flux:button size="sm" variant="filled" wire:click="reject({{ $report->id }})">Reject
+                    </flux:button>
                 </div>
             </div>
             <flux:text>Reported {{ $report->created_at->diffForHumans() }}</flux:text>
@@ -103,21 +118,17 @@ new class extends Component {
                     <flux:text class="mt-2">Make changes to the report details.</flux:text>
                 </div>
                 <form class="space-y-6" wire:submit.prevent="update({{ $report->id }})">
-                    <flux:input 
-                        wire:model.blur="editTitle" 
-                        label="Title" 
-                        placeholder="Enter report title"
-                    />
-                    @error('editTitle') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    
-                    <flux:textarea 
-                        wire:model.blur="editDescription" 
-                        label="Description" 
-                        rows="4"
-                        placeholder="Enter report description"
-                    />
-                    @error('editDescription') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    
+                    <flux:input wire:model.blur="editTitle" label="Title" placeholder="Enter report title" />
+                    @error('editTitle')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+
+                    <flux:textarea wire:model.blur="editDescription" label="Description" rows="4"
+                        placeholder="Enter report description" />
+                    @error('editDescription')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+
                     <div class="flex">
                         <flux:spacer />
                         <flux:button type="submit" variant="primary">Save changes</flux:button>
@@ -126,4 +137,5 @@ new class extends Component {
             </div>
         </flux:modal>
     @endforeach
+    
 </div>
