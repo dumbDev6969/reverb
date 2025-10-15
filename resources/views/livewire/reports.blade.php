@@ -106,6 +106,9 @@ new class extends Component {
                     </flux:button>
                     <flux:button size="sm" variant="filled" wire:click="reject({{ $report->id }})">Reject
                     </flux:button>
+                    <a href="{{  route('report.show', $report->id) }}">
+                        <flux:button size="sm" variant="filled">View</flux:button>
+                    </a>
                 </div>
             </div>
             <flux:text>Reported {{ $report->created_at->diffForHumans() }}</flux:text>

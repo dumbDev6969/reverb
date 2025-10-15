@@ -15,6 +15,8 @@ Route::view('dashboard', 'dashboard')
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('upload', ImageUpload::class)->name('file.upload');
+
+    Route::get('report/{report}', Report::class)->name('report.show');
 }); 
 
 Route::middleware(['auth', 'verified'])->group(function () {
